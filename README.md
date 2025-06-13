@@ -38,7 +38,7 @@ asl-recognition/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/asl-recognition.git
+   git clone https://github.com/ayaanniaz/ASLtoText-webapp.git
    cd asl-recognition
    ```
 
@@ -130,4 +130,3 @@ This project is licensed under the MIT License.
 - [ ] Add more ASL signs
 - [ ] Improve model accuracy
 - [ ] Add sentence construction
-- [ ] Mobile app development"# ASLtoText-webapp" 
