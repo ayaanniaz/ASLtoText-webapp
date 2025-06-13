@@ -15,7 +15,7 @@ COPY . /app
 RUN pip install --upgrade pip
 
 # Install mediapipe separately first
-RUN pip install mediapipe==0.10.9
+RUN pip install mediapipe==0.10.21
 RUN pip install tensorflow==2.13.0
 
 # Then install everything else
