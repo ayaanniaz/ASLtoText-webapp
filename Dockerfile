@@ -18,7 +18,7 @@ RUN pip install --upgrade pip setuptools wheel
 RUN pip install mediapipe==0.10.21
 
 # Install CPU-only TensorFlow (lighter weight)
-RUN pip install tensorflow-cpu==2.13.0
+RUN pip install tensorflow-cpu==2.17.1
 
 # Copy and install other dependencies
 COPY requirements.txt .
