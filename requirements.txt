@@ -1,9 +1,7 @@
 Flask
 opencv-python-headless
-mediapipe
 tensorflow
 numpy
 gunicorn
 Pillow
 scipy
-protobuf<4.0.0
