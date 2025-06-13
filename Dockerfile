@@ -1,32 +1,27 @@
-# Use Python 3.9 slim image
-FROM python:3.12-slim
+FROM python:3.10-slim
+
+# Install system dependencies required by OpenCV and Mediapipe
+RUN apt-get update && apt-get install -y \
+    ffmpeg libsm6 libxext6 libgl1 libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    libglib2.0-0 \
-    libsm6 \
-    libxext6 \
-    libxrender-dev \
-    libgomp1 \
-    libglib2.0-0 \
-    libgtk-3-0 \
-    && rm -rf /var/lib/apt/lists/*
+# Copy project files
+COPY . /app
 
-# Copy requirements and install Python dependencies
+# Install Python dependencies
+RUN pip install --upgrade pip
+
+# Install mediapipe separately first
+RUN pip install mediapipe==0.10.9
+
+# Then install everything else
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
-# Copy application code
-COPY . .
-
-# Create templates directory if it doesn't exist
-RUN mkdir -p templates static
-
-# Expose port
 EXPOSE 5000
 
-# Run the application
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
+# Start Flask app
+CMD ["python", "app.py"]
