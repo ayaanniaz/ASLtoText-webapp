@@ -27,6 +27,7 @@ asl-recognition/
 ├── action.h5             # Trained LSTM model
 ├── requirements.txt      # Python dependencies
 ├── render.yaml          # Render deployment config
+├── Dockerfile           # Docker configuration
 ├── templates/
 │   └── index.html       # Web interface
 └── README.md           # Project documentation
