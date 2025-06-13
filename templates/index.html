@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASL to Text Recognition</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .video-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        #video {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: scaleX(-1); /* Mirror the video */
+        }
+
+        #canvas {
+            display: none;
+        }
+
+        .prediction-display {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .prediction-word {
+            font-size: 2em;
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 10px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .confidence {
+            font-size: 1.2em;
+            color: #6c757d;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .info-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .recognized-words {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .recognized-words h3 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .word-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .word-tag {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            text-align: center;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .instructions {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .instructions h4 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .instructions ul {
+            color: #424242;
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 5px;
+        }
+
+        .learning-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .learning-section h2 {
+            color: #495057;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            text-align: center;
+        }
+
+        .youtube-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .youtube-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .youtube-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .youtube-card h4 {
+            color: #495057;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            font-size: 1.1em;
+        }
+
+        .youtube-link {
+            display: inline-block;
+            background: #ff0000;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        .youtube-link:hover {
+            background: #cc0000;
+        }
+
+        .footer {
+            text-align: center;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .github-link {
+            display: inline-block;
+            background: #333;
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        .github-link:hover {
+            background: #555;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .word-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .youtube-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>ASL to Text Recognition</h1>
+            <p>Real-time American Sign Language Recognition using AI</p>
+        </header>
+
+        <div class="main-content">
+            <div class="video-section">
+                <div class="instructions">
+                    <h4>Instructions</h4>
+                    <ul>
+                        <li>Click "Start Camera" to begin</li>
+                        <li>Allow camera access when prompted</li>
+                        <li>Position yourself clearly in front of the camera</li>
+                        <li>Perform ASL signs slowly and clearly</li>
+                        <li>Wait for the model to recognize your sign</li>
+                    </ul>
+                </div>
+                
+                <div id="status" class="status warning">
+                    Click "Start Camera" to begin recognition
+                </div>
+                
+                <div class="video-container">
+                    <video id="video" autoplay muted></video>
+                    <canvas id="canvas"></canvas>
+                </div>
+                
+                <div class="controls">
+                    <button id="startBtn" class="btn btn-primary">Start Camera</button>
+                    <button id="stopBtn" class="btn btn-secondary" disabled>Stop Camera</button>
+                    <button id="resetBtn" class="btn btn-secondary">Reset</button>
+                </div>
+                
+                <div class="prediction-display">
+                    <div class="prediction-word" id="prediction">Ready to recognize...</div>
+                    <div class="confidence" id="confidence">Confidence: 0%</div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="recognized-words">
+                    <h3>Recognizable Words</h3>
+                    <div class="word-grid">
+                        <div class="word-tag">Hello</div>
+                        <div class="word-tag">Thanks</div>
+                        <div class="word-tag">I Love You</div>
+                        <div class="word-tag">Night</div>
+                        <div class="word-tag">Please</div>
+                        <div class="word-tag">Help</div>
+                        <div class="word-tag">Life</div>
+                        <div class="word-tag">No</div>
+                        <div class="word-tag">Yes</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="learning-section">
+            <h2>Learn ASL Signs</h2>
+            <div class="youtube-grid">
+                <div class="youtube-card">
+                    <h4>Hello</h4>
+                    <a href="https://www.youtube.com/shorts/2t9OPWpVnf4" target="_blank" class="youtube-link">Learn on YouTube</a>
+                </div>
+                <div class="youtube-card">
+                    <h4>Thanks / Thank You</h4>
+                    <a href="https://www.youtube.com/watch?v=XbV6r0hLeg8" target="_blank" class="youtube-link">Learn on YouTube</a>
+                </div>
+                <div class="youtube-card">
+                    <h4>I Love You</h4>
+                    <a href="https://www.youtube.com/watch?v=8rkdu9D9geo&ab_channel=SignedWithHeart" target="_blank" class="youtube-link">Learn on YouTube</a>
+                </div>
+                <div class="youtube-card">
+                    <h4>Night</h4>
+                    <a href="https://www.youtube.com/watch?v=jyS1n_ctuVM&pp=ygUJbmlnaHQgYXNs" target="_blank" class="youtube-link">Learn on YouTube</a>
+                </div>
+                <div class="youtube-card">
+                    <h4>Please</h4>
+                    <a href="https://www.youtube.com/shorts/2ydksrdlI9o" target="_blank" class="youtube-link">Learn on YouTube</a>
+                </div>
+                <div class="youtube-card">
+                    <h4>Help</h4>
+                    <a href="https://www.youtube.com/watch?v=Euz1g9E-Mrw&pp=ygUIaGVscCBhc2w%3D" target="_blank" class="youtube-link">Learn on YouTube</a>
+                </div>
+                <div class="youtube-card">
+                    <h4>Life</h4>
+                    <a href="https://www.youtube.com/shorts/4zjI2DaUNlg" target="_blank" class="youtube-link">Learn on YouTube</a>
+                </div>
+                <div class="youtube-card">
+                    <h4>No</h4>
+                    <a href="https://www.youtube.com/shorts/I4qhzU-NLgY" target="_blank" class="youtube-link">Learn on YouTube</a>
+                </div>
+                <div class="youtube-card">
+                    <h4>Yes</h4>
+                    <a href="https://www.youtube.com/shorts/I4qhzU-NLgY" target="_blank" class="youtube-link">Learn on YouTube</a>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <h3>Source Code</h3>
+            <p>Check out the complete project on GitHub</p>
+            <br>
+            <a href="https://github.com/ayaanniaz/ASLtoText-webapp/tree/main" target="_blank" class="github-link">
+                View on GitHub
+            </a>
+        </footer>
+    </div>
+
+    <script>
+        let video = document.getElementById('video');
+        let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
+        let stream = null;
+        let processingInterval = null;
+        
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const status = document.getElementById('status');
+        const prediction = document.getElementById('prediction');
+        const confidence = document.getElementById('confidence');
+        
+        function updateStatus(message, type = 'warning') {
+            status.textContent = message;
+            status.className = `status ${type}`;
+        }
+        
+        function updatePrediction(pred, conf) {
+            prediction.textContent = pred || 'Ready to recognize...';
+            confidence.textContent = `Confidence: ${Math.round(conf * 100)}%`;
+        }
+        
+        async function startCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        width: 640, 
+                        height: 480,
+                        facingMode: 'user'
+                    } 
+                });
+                
+                video.srcObject = stream;
+                video.onloadedmetadata = () => {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    
+                    updateStatus('Camera started successfully!', 'success');
+                    startBtn.disabled = true;
+                    stopBtn.disabled = false;
+                    
+                    // Start processing frames
+                    processingInterval = setInterval(processFrame, 200); // Process every 200ms
+                };
+            } catch (err) {
+                console.error('Error accessing camera:', err);
+                updateStatus('Error accessing camera. Please check permissions.', 'error');
+            }
+        }
+        
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            
+            if (processingInterval) {
+                clearInterval(processingInterval);
+                processingInterval = null;
+            }
+            
+            video.srcObject = null;
+            updateStatus('Camera stopped', 'warning');
+            updatePrediction('', 0);
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+        }
+        
+        function processFrame() {
+            if (!video.videoWidth || !video.videoHeight) return;
+            
+            // Draw current frame to canvas
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Convert canvas to base64
+            const dataURL = canvas.toDataURL('image/jpeg', 0.8);
+            
+            // Send frame to server for processing
+            fetch('/process_frame', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    image: dataURL
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    updatePrediction(data.prediction, data.confidence);
+                    if (data.prediction) {
+                        updateStatus(`Recognized: ${data.prediction}`, 'success');
+                    } else {
+                        updateStatus('Processing... Perform an ASL sign', 'warning');
+                    }
+                } else {
+                    console.error('Error processing frame:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                updateStatus('Error processing frame', 'error');
+            });
+        }
+        
+        function resetSequence() {
+            fetch('/reset_sequence', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    updatePrediction('', 0);
+                    updateStatus('Sequence reset. Ready for new recognition.', 'success');
+                }
+            })
+            .catch(error => {
+                console.error('Error resetting sequence:', error);
+            });
+        }
+        
+        // Event listeners
+        startBtn.addEventListener('click', startCamera);
+        stopBtn.addEventListener('click', stopCamera);
+        resetBtn.addEventListener('click', resetSequence);
+        
+        // Cleanup when page is unloaded
+        window.addEventListener('beforeunload', stopCamera);
+    </script>
+</body>
+</html>
