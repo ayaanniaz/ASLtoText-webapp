@@ -83,6 +83,9 @@ asl-recognition/
 3. **Upload Model File**
    - Due to GitHub's file size limits, upload `action.h5` directly to Render
    - Or use Git LFS for large files
+  
+4. **Access Web-App**
+   - https://asltotext-webapp.onrender.com/
 
 ## Usage Instructions
 
