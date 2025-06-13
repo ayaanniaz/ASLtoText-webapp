@@ -1,7 +1,7 @@
-streamlit>=1.28.0
+Flask==2.3.3
 opencv-python-headless==4.8.1.78
-mediapipe>=0.10.0
-tensorflow>=2.13.0
-numpy>=1.24.0
-Pillow>=9.5.0
-protobuf>=3.20.0,<5.0.0
+numpy==1.24.3
+mediapipe==0.10.7
+tensorflow-cpu==2.13.0
+Pillow==10.0.1
+gunicorn==21.2.0
