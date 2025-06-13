@@ -2,8 +2,7 @@ opencv-python-headless==4.6.0.66
 Flask==2.3.3
 mediapipe==0.10.9
 tensorflow==2.13.0
-numpy==1.24.3         
+numpy==1.24.3
 gunicorn==21.2.0
-jax==0.4.23
-jaxlib==0.4.23
-ml-dtypes==0.2.0
+Pillow==9.5.0
+typing-extensions==4.5.0
