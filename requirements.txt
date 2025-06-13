@@ -1,7 +1,1 @@
-Flask
-opencv-python-headless
-tensorflow
-numpy
-gunicorn
-Pillow
-scipy
+
