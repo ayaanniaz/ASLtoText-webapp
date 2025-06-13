@@ -1,5 +1,5 @@
-FROM python:3.10-slim
-
+FROM python:3.12-slim
+ENV CUDA_VISIBLE_DEVICES=""
 # Install system dependencies required by OpenCV and Mediapipe
 RUN apt-get update && apt-get install -y \
     ffmpeg libsm6 libxext6 libgl1 libglib2.0-0 \
