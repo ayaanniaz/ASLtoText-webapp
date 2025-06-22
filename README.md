@@ -123,12 +123,6 @@ asl-recognition/
 
 This project is licensed under the MIT License.
 
-## Acknowledgments
-
-- MediaPipe team for pose estimation
-- TensorFlow team for deep learning framework
-- ASL community for sign language resources
-
 ## Future Enhancements
 
 - [ ] Add more ASL signs
