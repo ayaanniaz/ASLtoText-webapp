@@ -1,6 +1,6 @@
 Flask==2.3.3
 opencv-python-headless==4.8.1.78
-numpy==1.24.3
+numpy==1.26.4
 mediapipe==0.10.7
 tensorflow-cpu==2.13.0
 Pillow==10.0.1
